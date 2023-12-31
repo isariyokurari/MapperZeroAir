@@ -8,7 +8,8 @@ MapperZeroAir は、「ファミコン実機で自作プログラムをダウン
 
 # 解決方法
 
-ファミコンからカセットを抜かずに無線でプログラムをダウンロードでき、無線でリセットできて、無線でV/Hミラーも指定でき、デバッグ用にLEDが付いていて、printデバッグもできて欲しい、のでそうする事にしました。
+ファミコンからカセットを抜かずに無線でプログラムをダウンロードして完了したら自動的にリセットがかかるようにしました。  
+ついでに、無線でV/Hミラーも指定でき、デバッグ用にLEDが付いていて、printデバッグもできて欲しい、のでそうする事にしました。
 
 ![(*) --> ソースコード修正
 ソースコード修正 --> nesファイル生成
@@ -51,8 +52,8 @@ HWは無線機能付きマイコンの載ったファミコンカセットです
 
 ```
 MapperZeroAir
-│　　　LICENSE
-│　　　README.md
+│　LICENSE
+│　README.md
 │
 ├─schema
 │　　　MapperZeroAir.pdf
@@ -64,10 +65,12 @@ MapperZeroAir
 │
 ├─arduino
 │　└─MapperZeroAir
-│　　　MapperZeroAir.h
-│　　　MapperZeroAir.ino
+│　　　　　MapperZeroAir.h
+│　　　　　MapperZeroAir.ino
 │
 └─asm
+　　└─prg0000_HelloWorld
+　　　　　　prg0000_HelloWorld.asm
 ```
 
 ## 作者開発環境(動作確認環境)
