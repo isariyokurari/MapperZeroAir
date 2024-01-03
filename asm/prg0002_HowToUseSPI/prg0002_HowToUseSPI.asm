@@ -1,4 +1,4 @@
-; $Id: prg0002_HowToUseSPI.asm 1550 2023-12-16 06:01:32Z sow $
+; $Id: prg0002_HowToUseSPI.asm 1589 2024-01-03 14:36:34Z sow $
 
 ; CONFIG
 ; ----
@@ -264,6 +264,7 @@ MAIN_INIT:
     sta <WORK_H
     jsr SPI_BUS_RESET
 MAIN_LOOP:
+    jsr WAIT_NEXT_VBLANK
     jsr SEND_MESSAGE_VIA_SPI
 MAIN_LOOP_END:
     jmp MAIN_LOOP
@@ -277,7 +278,6 @@ MAIN_LOOP_END:
 ; STACK: 2
 ; CONSTRAINT: WAIT_NEXT_VBLANK and SEND_MESSAGE_EXE are necessary
 SEND_MESSAGE_VIA_SPI:
-    jsr WAIT_NEXT_VBLANK
     inc <WORK_L
     lda <WORK_L
     lsr a
@@ -335,7 +335,7 @@ SPI_BUS_RESET:                                         ; SPI_OUTPUT_EN
 ; INPUT: X ... Send data                               ; SPI_OUTPUT_EN
 ; OUTPUT: None                                         ; SPI_OUTPUT_EN
 ; BROKEN: P                                            ; SPI_OUTPUT_EN
-; STACK: 2                                             ; SPI_OUTPUT_EN
+; STACK: 3                                             ; SPI_OUTPUT_EN
 ; CONSTRAINT: None                                     ; SPI_OUTPUT_EN
 SPI_SEND_A_BYTE:                                       ; SPI_OUTPUT_EN
     pha                                                ; SPI_OUTPUT_EN
