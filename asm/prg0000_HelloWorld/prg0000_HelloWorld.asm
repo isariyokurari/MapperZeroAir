@@ -1,4 +1,4 @@
-; $Id: prg0000_HelloWorld.asm 1421 2023-03-31 16:28:50Z sow $
+; $Id: prg0000_HelloWorld.asm 2049 2025-05-02 09:42:36Z sow $
 
 ; CONFIG
 ; ----
@@ -139,34 +139,34 @@ RST_VEC:
     lda #DisDisplay
     sta PPUCNT1
 
-; FUNCTION: Copy CHR_BIN to PPU Address $0000-1FFF
-    .if (FILL_CHR_ROM_EN)
-FILL_CHR_ROM
-    lda #low(CHR_BIN)
-    sta <WORK_L
-    lda #high(CHR_BIN)
-    sta <WORK_H
-    ldy #$00
-    ldx #$00
-FILL_CHR_ROM_0:
-    jsr WAIT_NEXT_VBLANK
-    stx PPUADDR
-    sty PPUADDR
-FILL_CHR_ROM_1:
-    lda [WORK],y
-    sta PPUIO
-    iny
-    tya
-    and #$3F
-    bne FILL_CHR_ROM_1
-    tya
-    bne FILL_CHR_ROM_0
-    inc <WORK_H
-    inx
-    cpx #$20
-    bne FILL_CHR_ROM_0
-    jsr WAIT_NEXT_VBLANK
-    .endif
+; FUNCTION: Copy CHR_BIN to PPU Address $0000-1FFF ; FILL_CHR_ROM_EN
+    .if (FILL_CHR_ROM_EN)                          ; FILL_CHR_ROM_EN
+FILL_CHR_ROM                                       ; FILL_CHR_ROM_EN
+    lda #low(CHR_BIN)                              ; FILL_CHR_ROM_EN
+    sta <WORK_L                                    ; FILL_CHR_ROM_EN
+    lda #high(CHR_BIN)                             ; FILL_CHR_ROM_EN
+    sta <WORK_H                                    ; FILL_CHR_ROM_EN
+    ldy #$00                                       ; FILL_CHR_ROM_EN
+    ldx #$00                                       ; FILL_CHR_ROM_EN
+FILL_CHR_ROM_0:                                    ; FILL_CHR_ROM_EN
+    jsr WAIT_NEXT_VBLANK                           ; FILL_CHR_ROM_EN
+    stx PPUADDR                                    ; FILL_CHR_ROM_EN
+    sty PPUADDR                                    ; FILL_CHR_ROM_EN
+FILL_CHR_ROM_1:                                    ; FILL_CHR_ROM_EN
+    lda [WORK],y                                   ; FILL_CHR_ROM_EN
+    sta PPUIO                                      ; FILL_CHR_ROM_EN
+    iny                                            ; FILL_CHR_ROM_EN
+    tya                                            ; FILL_CHR_ROM_EN
+    and #$3F                                       ; FILL_CHR_ROM_EN
+    bne FILL_CHR_ROM_1                             ; FILL_CHR_ROM_EN
+    tya                                            ; FILL_CHR_ROM_EN
+    bne FILL_CHR_ROM_0                             ; FILL_CHR_ROM_EN
+    inc <WORK_H                                    ; FILL_CHR_ROM_EN
+    inx                                            ; FILL_CHR_ROM_EN
+    cpx #$20                                       ; FILL_CHR_ROM_EN
+    bne FILL_CHR_ROM_0                             ; FILL_CHR_ROM_EN
+    jsr WAIT_NEXT_VBLANK                           ; FILL_CHR_ROM_EN
+    .endif                                         ; FILL_CHR_ROM_EN
 
 ; FUNCTION: Copy PALETTE to PPU Address $3F00-3FFF
 LOAD_PALETTE:
