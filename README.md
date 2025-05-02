@@ -1,4 +1,4 @@
-<!-- $Id: README.md 2046 2025-05-02 07:02:21Z sow $ -->
+<!-- $Id: README.md 2047 2025-05-02 07:36:26Z sow $ -->
 # 無線ダウンロード実行カセット MappserZeroAir
 
 MapperZeroAir は、「ファミコン実機で自作プログラムをダウンロード実行」する操作を爆速で回すためのHW/SWです。
@@ -103,11 +103,9 @@ MapperZeroAirをファミコン本体に挿し、ファミコン本体に電源�
 
 ![prg0000_HelloWorld0000.png](img/prg0000_HelloWorld0000.png)
 
-## 2-5. 実行例
+実行した様子を収めた動画は下から閲覧できます。
 
-下に実行例の動画を示します。
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/zyV-2UMJdmg?si=1XybDUEhwA2YNlFr" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![http://img.youtube.com/vi/zyV-2UMJdmg/sddefault.jpg](http://img.youtube.com/vi/zyV-2UMJdmg/sddefault.jpg)](https://www.youtube.com/watch?v=zyV-2UMJdmg)
 
 # 3. 公開
 
