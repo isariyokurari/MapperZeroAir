@@ -1,4 +1,4 @@
-<!-- $Id: README.md 2050 2025-05-02 09:46:08Z sow $ -->
+<!-- $Id: README.md 2054 2025-05-02 13:04:26Z sow $ -->
 # 無線ダウンロード実行カセット MappserZeroAir
 
 MapperZeroAir は、「ファミコン実機で自作プログラムをダウンロード実行」する操作を爆速で回すためのファミコンカセットです。
@@ -44,7 +44,7 @@ MapperZeroAir.exe実行 --> テスト](http://www.plantuml.com/plantuml/png/fLDD
 
 # 2. 使い始めるまで
 
-この章では、MapperZeroAirが手元に届いてから利用開始する前での手順を示します。
+この章では、MapperZeroAirが手元に届いてから利用開始する前での手順を示します。<br>
 ※ここでは、Windows 11 HOME 24H2 の場合の接続方法です。OSのエディションやバージョンの違いで見た目や手順が多少異なる場合があります。
 
 ## 2-1. HWセットアップ
@@ -107,6 +107,7 @@ MapperZeroAirをファミコン本体に挿し、ファミコン本体に電源�
 
 実行した様子を収めた動画は下から閲覧できます。
 
+https://youtu.be/zyV-2UMJdmg<br>
 [![prg0000_HelloWorld0000_thumbnail.png](img/prg0000_HelloWorld0000_thumbnail.png)](https://www.youtube.com/watch?v=zyV-2UMJdmg)
 
 # 3. 使い方
@@ -123,6 +124,9 @@ Usage : MapperZeroAir.exe <COMn> <FILE> [--irq]
 
 対応しているマッパーは マッパー#0 と マッパー#2(CHR-ROMが0kバイト) です。PRG-ROMは16kバイトか32kバイト、CHR-ROMは0kバイトか8kバイトに対応しています。マッパー#0のダウンロードは、最初にCHR-ROMローダをダウンロード実行した後、PRG-ROMをダウンロードします。この時、CHR-ROMローダのダウンロード後とPRG-ROMのダウンロード後にリセット操作の指示が出るので従ってください。マッパー#2をダウンロードする場合、CHR-ROMローダのダウンロード実行はありません。マッパー#2 且つ「--irq」オプション指定し、後述する「IRQをトリガとしたリセット」を実装すると、ファミコン本体の操作なしにダウンロード後にリセットベクタへ飛ばすことができます。16kバイトのPRG-ROMのみのマッパー#2をダウンロード実行することでTATよく実機確認を行えます。
 
+参考動画：ファミコンカセットに無線でダウンロードして実行＆自動リセット<br>
+https://youtu.be/zyV-2UMJdmg
+
 ### モニタ実行
 
 ファミコン用プログラムから送られてくるデータをASCII文字で表示するモードです。
@@ -130,6 +134,9 @@ Usage : MapperZeroAir.exe <COMn> <FILE> [--irq]
 ```
 Usage: MapperZeroAir.exe <COMn> --spi
 ```
+
+参考動画：ホストPCでファミコンのコントローラ情報を表示<br>
+https://youtu.be/Nj-gnS3i97A
 
 ## 3-2. ファミコン用プログラムの書き方
 
@@ -139,13 +146,27 @@ Usage: MapperZeroAir.exe <COMn> --spi
 
 サンプル「asm/prg0000_HelloWorld/prg0000_HelloWorld.asm」は、「16kバイトのPRG-ROMのみのマッパー#2」なサンプルプログラムとなっており、「IRQ割り込みをトリガとしたリセット」が実装されています。コード中の FILL_CHR_ROM_EN および USE_IRQ_LOADER を「1」にしておくことで、コード修正後のダウンロード実行を本体に触れずに実行できます。一度 CHR-ROM の内容が転送された後は、FILL_CHR_ROM_EN を「0」にすることで、さらにプログラムの起動を早くすることができます。この仕組みを利用する場合は、FILL_CHR_ROM_EN と記載のある行や USE_IRQ_LOADER と記載のある行を自身のコードに埋め込んでください。シーケンスの詳細は設計情報「ダウンロード実行のシーケンス図」を参考にしてください。
 
+参考動画：ファミコンカセットに無線でダウンロードして実行＆自動リセット<br>
+https://youtu.be/zyV-2UMJdmg
+
 ### LEDの操作
 
 サンプル「asm/prg0001_BlinkLED/prg0001_BlinkLED.asm」は、LEDを操作するサンプルプログラムです。LEDはCPUアドレスマップの$6000の下位3bitに接続されたラッチの出力の最下位bitに接続されています。1をセットするとLEDが点灯し、0をセットすると消灯します。LEDを制御するラッチの出力は、後述するSPIバスのSCK信号と共有しています。
 
+参考動画：MapperZeroAirを使った「ファミコンでLチカ」<br>
+https://youtu.be/3pPrdFvhvLE
+
 ### printの操作
 
 サンプル「asm/prg0002_HowToUseSPI/prg0002_HowToUseSPI.asm」は、CPUアドレスマップの$6000の下位3bitに接続されたラッチでSPIバスを操作して、ホストPCにprint出力をするサンプルプログラムです。SPI_OUTPUT_EN を「1」にすると、SPI_BUS_RESET と SPI_SEND_A_BYTE が使えるようになります。SPI_BUS_RESET を実行後、printしたいデータをXレジスタに入れて SPI_SEND_A_BYTE を呼び出すことで、ホストPCに1Byteのデータを送信、print出力することができます。ホストPCは、前述の「モニタ実行」をしておくと、ファミコンからprint出力されたデータをASCII文字で表示することができます。この仕組みを利用する場合は、SPI_OUTPUT_EN と記載のある行を自身のコードに埋め込み、SPI_BUS_RESET を実行後、printしたいデータをXレジスタに入れて SPI_SEND_A_BYTE を呼び出してください。
+
+参考動画：ファミコンからホストPCにデータを送る例<br>
+https://youtu.be/u2sw9qeY_OA
+
+サンプル「asm/prg0003_DumpPad1ViaSPI/prg0003_DumpPad1ViaSPI.asm」も、ファミコンからホストPCにデータを送る例です。ファミコンのコントローラの入力状態をホストPCで表示しているため、ファミコンからデータを送っていることが分かりやすいです。文字コード「0x0D」(キャリッジリターン)によりカーソルが行頭に戻され、表示中の0と1が更新されていることが見て取れます。
+
+参考動画：ホストPCでファミコンのコントローラ情報を表示<br>
+https://youtu.be/Nj-gnS3i97A
 
 # 4. 公開
 
@@ -159,21 +180,24 @@ MapperZeroAir
 │　README.md
 │
 ├─schema
-│　　　MapperZeroAir.pdf
+│　　　MapperZeroAir.pdf          ... 回路図
 │
 ├─exe
 │　　　Makefile
-│　　　MapperZeroAir.c
-│　　　MapperZeroAir.exe
+│　　　MapperZeroAir.c            ... ホストPC用実行ファイルのソースコード
+│　　　MapperZeroAir.exe          ... ホストPC用実行ファイル
 │
 ├─arduino
 │　└─MapperZeroAir
-│　　　　　MapperZeroAir.h
-│　　　　　MapperZeroAir.ino
+│　　　　　MapperZeroAir.h        ... MapperZeroAir用のヘッダファイル(.cおよび.inoから参照)
+│　　　　　MapperZeroAir.ino      ... MapperZeroAirに搭載されたマイコン用のコード
+│
+├─nes
+│　　　prg0000_HelloWorld..nes    ... 動作確認用のnesファイル
 │
 └─asm
 　　└─prg0000_HelloWorld
-　　　　　　prg0000_HelloWorld.asm
+　　　　　　prg0000_HelloWorld.asm ... サンプルコード(NESASM用)
 ```
 
 ## 4-2. 開発環境(動作確認環境)
@@ -193,33 +217,44 @@ MapperZeroAir
 
 ## 4-4. テスト
 
+### MapperZeroAir.exe
+
+exe/Makefile にて、ターゲット「test」でテストが実装されています。
+
+### 出荷前テスト
+
+下に出荷前テストの項目を示します。
+- 工事中
+
 ## 4-5. サンプルプログラム
+
+asm/prgXXXX_YYYYYYYY にサンプルコードがあります。詳細は、asm/prgXXXX_YYYYYYYY/readme.md を参照してください。
 
 ## 4-6. フォント
 
-公開アセンブラコードでは、下記自作フォントを使用しています。  
+公開アセンブラコードでは、下記自作フォントを使用しています。
 
 ![font.png](img/font.png)
 
 # 5. Q&A
 
-Q. 「デバイスの準備が整いました!」となっても「MapperZeroAir」が「未接続」になる
+Q. 「デバイスの準備が整いました!」となっても「MapperZeroAir」が「未接続」になる<br>
 A. 「接続済み」となった後、すぐに「未接続」となりますが、「完了」を押していただければ問題ありません。
 
 ![BluetoothSetupA.png](img/BluetoothSetupA.png)
 
-Q. ダウンロード実行がうまくいきません
+Q. ダウンロード実行がうまくいきません<br>
 A. ダウンロード中にファミコンのプログラムが暴走している可能性があります。ファミコン本体のリセットボタンを押した状態でnes/prg0000_HelloWorld.nesをダウンロードしてみてください。
 
 # 6. 販売ページ
 
-以下から MapperZeroAir を購入できます。
-https://isariyokurari.booth.pm/items/6864946
+以下から MapperZeroAir を購入できます。<br>
+https://isariyokurari.booth.pm/items/6864946<br>
 ※2025年5月1日現在、SRAMが2種類ともOELとなっています。数に限りがございますので早めにお買い求めください。
 
 # 7. 引用商標
 
-- ファミコンは、日本またはその他地域における任天堂株式会社の登録商標です。  
+- ファミコンは、日本またはその他地域における任天堂株式会社の登録商標です。
 - Windowsは、米国またはその他地域におけるMicrosoft社の登録商標です。
 - Arduinoは、日本国内においてArduino SRLの商標登録です。
 - ESP32は、Espressif Systems (Shanghai) Co., Ltd.の中国または他の国における商標登録または商標です。
