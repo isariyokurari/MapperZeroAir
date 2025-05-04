@@ -1,7 +1,7 @@
-<!-- $Id: README.md 2054 2025-05-02 13:04:26Z sow $ -->
+<!-- $Id: README.md 2056 2025-05-04 12:56:40Z sow $ -->
 # 無線ダウンロード実行カセット MappserZeroAir
 
-MapperZeroAir は、「ファミコン実機で自作プログラムをダウンロード実行」する操作を爆速で回すためのファミコンカセットです。
+MapperZeroAir は、「ファミコン実機で自作プログラムを無線でダウンロード実行」するためのファミコンカセットです。
 
 ![MapperZeroAir500x480.png](img/MapperZeroAir500x480.png)
 
@@ -114,8 +114,7 @@ https://youtu.be/zyV-2UMJdmg<br>
 
 ## 3-1. MapperZeroAir.exe の使い方
 
-### ダウンロード実行
-
+**ダウンロード実行**<br>
 MapperZeroAirにプログラムをダウンロードするモードです。「--irq」オプションは、プログラムのダウンロードの前にIRQ割り込みを発生させるオプションです。
 
 ```
@@ -127,8 +126,7 @@ Usage : MapperZeroAir.exe <COMn> <FILE> [--irq]
 参考動画：ファミコンカセットに無線でダウンロードして実行＆自動リセット<br>
 https://youtu.be/zyV-2UMJdmg
 
-### モニタ実行
-
+**モニタ実行**<br>
 ファミコン用プログラムから送られてくるデータをASCII文字で表示するモードです。
 
 ```
@@ -142,22 +140,19 @@ https://youtu.be/Nj-gnS3i97A
 
 本ドキュメントは、ファミコン用のアセンブラにNESASMを想定しています。アセンブラによるファミコン向けプログラムを作成、修正、エミュレータなどで実行、デバッグできる方を対象として説明します。
 
-### IRQをトリガとしたリセット
-
+**IRQをトリガとしたリセット**<br>
 サンプル「asm/prg0000_HelloWorld/prg0000_HelloWorld.asm」は、「16kバイトのPRG-ROMのみのマッパー#2」なサンプルプログラムとなっており、「IRQ割り込みをトリガとしたリセット」が実装されています。コード中の FILL_CHR_ROM_EN および USE_IRQ_LOADER を「1」にしておくことで、コード修正後のダウンロード実行を本体に触れずに実行できます。一度 CHR-ROM の内容が転送された後は、FILL_CHR_ROM_EN を「0」にすることで、さらにプログラムの起動を早くすることができます。この仕組みを利用する場合は、FILL_CHR_ROM_EN と記載のある行や USE_IRQ_LOADER と記載のある行を自身のコードに埋め込んでください。シーケンスの詳細は設計情報「ダウンロード実行のシーケンス図」を参考にしてください。
 
 参考動画：ファミコンカセットに無線でダウンロードして実行＆自動リセット<br>
 https://youtu.be/zyV-2UMJdmg
 
-### LEDの操作
-
+**LEDの操作**<br>
 サンプル「asm/prg0001_BlinkLED/prg0001_BlinkLED.asm」は、LEDを操作するサンプルプログラムです。LEDはCPUアドレスマップの$6000の下位3bitに接続されたラッチの出力の最下位bitに接続されています。1をセットするとLEDが点灯し、0をセットすると消灯します。LEDを制御するラッチの出力は、後述するSPIバスのSCK信号と共有しています。
 
 参考動画：MapperZeroAirを使った「ファミコンでLチカ」<br>
 https://youtu.be/3pPrdFvhvLE
 
-### printの操作
-
+**printの操作**<br>
 サンプル「asm/prg0002_HowToUseSPI/prg0002_HowToUseSPI.asm」は、CPUアドレスマップの$6000の下位3bitに接続されたラッチでSPIバスを操作して、ホストPCにprint出力をするサンプルプログラムです。SPI_OUTPUT_EN を「1」にすると、SPI_BUS_RESET と SPI_SEND_A_BYTE が使えるようになります。SPI_BUS_RESET を実行後、printしたいデータをXレジスタに入れて SPI_SEND_A_BYTE を呼び出すことで、ホストPCに1Byteのデータを送信、print出力することができます。ホストPCは、前述の「モニタ実行」をしておくと、ファミコンからprint出力されたデータをASCII文字で表示することができます。この仕組みを利用する場合は、SPI_OUTPUT_EN と記載のある行を自身のコードに埋め込み、SPI_BUS_RESET を実行後、printしたいデータをXレジスタに入れて SPI_SEND_A_BYTE を呼び出してください。
 
 参考動画：ファミコンからホストPCにデータを送る例<br>
@@ -209,20 +204,35 @@ MapperZeroAir
 
 ## 4-3. 設計
 
-### MapperZeroAirのブロック図
+**PRG-ROM BUS**<br>
+カードエッジコネクタのPRG-ROMバスは、32kByteのSRAMを接続します。ただし、マイコンからSRAMへ書き込みができるように、アドレスバス(A[14:0])やアウトプットイネーブル(OE)を非選択にできるようにします。使用するGPIOを節約するため、マイコンから指定するアドレスはマイコンのデータバスをラッチします。I/Oのレベル調整のため、PRG-ROMからの出力は5VトレラントのICで受け、SRAMの出力は低Vthのバッファを介してPRG-ROMに接続します。<br>
+![MapperZeroAirBlockDiagram_PRG-ROM.png](img/MapperZeroAirBlockDiagram_PRG-ROM.png)
 
-### MapperZeroAirのメモリマップ
+**CHR-ROM BUS**<br>
+カードエッジコネクタのCHR-ROMバスは、8kByteのSRAMを接続します。マイコンから直接8kByteのSRAMへ書き込むことをあきらめ、CHR-ROMの内容を8kByteのSRAMへ書き込むファミコン用のソフトウェアを実行することで代替することにより、部品点数を削減しています。また、Vミラー/Hミラーの切り替えをマイコンから行えるよう、VRAM_A10への接続を切り替えるセレクタ回路を設けます。セレクタ回路はVRAM-A10に接続するため5V系とし、低Vthのバッファを介したマイコンの出力を選択信号として使用します。<br>
+![MapperZeroAirBlockDiagram_CHR-ROM.png](img/MapperZeroAirBlockDiagram_CHR-ROM.png)
 
-### ダウンロード実行のシーケンス図
+**IRQ**<br>
+カードエッジコネクタのIRQ信号は、IRQ信号が5V系の信号であるため、低Vthのバッファを介したマイコンの出力を接続します。バッファの出力は、0Vとハイインピーダンスの2状態を使用します。出力にプルアップ抵抗を接続することでオープンドレインの信号として扱います。<br>
+![MapperZeroAirBlockDiagram_IRQ.png](img/MapperZeroAirBlockDiagram_IRQ.png)
+
+**SPI**<br>
+カードエッジコネクタのPRG-ROMバスとPHI2を使用し、マイコンに対してファミコンがSPIバスのマスターとして動作できるようにします。A[13]、A[14]、OEをデコードし、ファミコンがCPUバス空間の$6000～$7FFFアクセスにしたときに有効となる信号を生成、さらにPHY2とR/Wをイネーブラとすることで、データバスの下位3bitをラッチするラッチ信号とします。カードエッジコネクタ側は5Vでマイコン側は3.3V系であるため、デコーダやラッチは5Vトレラントのものを使用します。また、ラッチ後の最下位bitにはデバッグ用のLEDを接続しておきます。<br>
+![MapperZeroAirBlockDiagram_SPI.png](img/MapperZeroAirBlockDiagram_SPI.png)
+
+**Audio**<br>
+カードエッジコネクタのAudio周りは特になにもせずそのまま戻します。<br>
+![MapperZeroAirBlockDiagram_Audio.png](img/MapperZeroAirBlockDiagram_Audio.png)
+
+ダウンロード実行のシーケンス図
 
 ## 4-4. テスト
 
-### MapperZeroAir.exe
+MapperZeroAir.exe
 
 exe/Makefile にて、ターゲット「test」でテストが実装されています。
 
-### 出荷前テスト
-
+**出荷前テスト**<br>
 下に出荷前テストの項目を示します。
 - 工事中
 
@@ -258,3 +268,4 @@ https://isariyokurari.booth.pm/items/6864946<br>
 - Windowsは、米国またはその他地域におけるMicrosoft社の登録商標です。
 - Arduinoは、日本国内においてArduino SRLの商標登録です。
 - ESP32は、Espressif Systems (Shanghai) Co., Ltd.の中国または他の国における商標登録または商標です。
+
