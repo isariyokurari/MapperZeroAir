@@ -1,4 +1,4 @@
-<!-- $Id: README.md 2056 2025-05-04 12:56:40Z sow $ -->
+<!-- $Id: README.md 2057 2025-05-05 01:52:01Z sow $ -->
 # 無線ダウンロード実行カセット MappserZeroAir
 
 MapperZeroAir は、「ファミコン実機で自作プログラムを無線でダウンロード実行」するためのファミコンカセットです。
@@ -9,12 +9,11 @@ MapperZeroAir は、「ファミコン実機で自作プログラムを無線で
 
 ## 1-1. 痛み
 
-ファミコン向けにプログラムを書いてエミュレータで動作確認できていても、いざファミコン実機で試すと思ったように動かない。実機でデバッグしようとするとファミコンの電源切ってカセット抜いてROM焼き直してカセット挿し直して電源入れて...とめちゃくちゃTATが悪い。もっと効率よく小さいプログラムの塊をデバッグできるようにならないものか。
+ファミコン向けにプログラムを書いてエミュレータで動作確認できていても、いざファミコン実機で試すと思ったように動かない。実機でデバッグしようとするとファミコンの電源切ってカセット抜いてROM焼き直してカセット挿し直して電源入れて...とめちゃくちゃ手間がかかる。もっと効率よく小さいプログラムの塊を実機でデバッグできるようにならないものか。
 
 ## 1-2. 解決方法
 
-ファミコンからカセットを抜かずに無線でプログラムをダウンロードして完了したら自動的にリセットがかかるようにしました。
-ついでに、無線でV/Hミラーも指定でき、デバッグ用にLEDが付いていて、printデバッグもできて欲しい、のでそうする事にしました。
+ファミコンからカセットを抜かずに無線でプログラムをダウンロードし、ダウンロードが完了したら自動的にリセットがかかるようにする。ついでに、無線でV/Hミラーも変更でき、デバッグ用にLEDが付いていて、printデバッグもできて欲しい、のでそうする。
 
 ![(*) --> ソースコード修正
 ソースコード修正 --> nesファイル生成
@@ -31,23 +30,23 @@ MapperZeroAir.exe実行 --> テスト](http://www.plantuml.com/plantuml/png/fLDD
 
 ## 1-3. 特徴
 
-- ファミコン本体の改造不要、ホストWindowsも専用ドライバのインストール不要で使えます
-- ホストPCから無線越しにNESファイル(PRG-ROM最大32kバイト、CHR-ROM最大8kバイト)をダウンロード可能です
-- NESファイルのヘッダに記載されているVミラー/Hミラーの設定をカセットに反映します
-- カセットから本体へ送るIRQ割り込み信号を無線越しに生成可能です
-- カセットに実装されたデバッグ用のLEDをファミコン用のプログラムから制御可能です
-- ファミコンからI/O操作によりホストPCへデータを送信可能です
+- ファミコン本体の改造不要、ホストPC(Windowsマシン)も専用ドライバのインストール不要で使える
+- ホストPCから無線越しにNESファイル(PRG-ROM最大32kバイト、CHR-ROM最大8kバイト)をダウンロード可能
+- NESファイルのヘッダに記載されているVミラー/Hミラーの設定をカセットに反映
+- カセットから本体へ送るIRQ割り込み信号を無線越しに生成可能
+- カセットに実装されたデバッグ用のLEDをファミコン用のプログラムから制御可能
+- ファミコンによるI/O操作によりホストPCへデータを送信可能
 
 ## 1-4. 構成
 
-ハードウェア(HW)は無線機能付きマイコンの載ったファミコンカセットです。ソフトウェア(SW)はWindows向けのexeファイルを作成しました。両者の間は Bluetooth の COMポート を介して無線でやり取りします。
+ハードウェアは無線機能付きマイコンの載ったファミコンカセットです。ソフトウェアはWindows向けのexeファイルを作成しました。両者の間は Bluetooth の COMポート を介して無線でやり取りします。
 
 # 2. 使い始めるまで
 
-この章では、MapperZeroAirが手元に届いてから利用開始する前での手順を示します。<br>
-※ここでは、Windows 11 HOME 24H2 の場合の接続方法です。OSのエディションやバージョンの違いで見た目や手順が多少異なる場合があります。
+この章では、MapperZeroAirを利用開始する前での手順を示します。<br>
+※ここでは、Windows11 HOME 24H2 の場合の接続方法です。OSのエディションやバージョンの違いで見た目や手順が多少異なる場合があります。
 
-## 2-1. HWセットアップ
+## 2-1. ハードウェアのセットアップ
 
 MapperZeroAirをファミコン本体に挿し、ファミコン本体に電源を入れます。
 
@@ -57,7 +56,7 @@ MapperZeroAirをファミコン本体に挿し、ファミコン本体に電源�
 
 0. Windowsキーを押下し、設定を開きます。
 
-1. 「Bluetooth とデバイス」を選択し、「Bluetooth」を「オン」にしてから「＋デバイスの追加」を押下します。
+1. 「Bluetooth とデバイス」を選択し、「Bluetooth」を「オン」にしてから「＋デバイスの追加」を押下し「デバイを追加する」を開きます。
 
 ![BluetoothSetup1.png](img/BluetoothSetup1.png)
 
@@ -85,11 +84,11 @@ MapperZeroAirをファミコン本体に挿し、ファミコン本体に電源�
 
 ![BluetoothSetup6.png](img/BluetoothSetup6.png)
 
-7. 下までスクロールして「その他の Bluetooth 設定」を開きます
+7. 下までスクロールして「その他の Bluetooth 設定」を押下し、「Bluetooth 設定」を開きます。
 
 ![BluetoothSetup7.png](img/BluetoothSetup7.png)
 
-8. タブ「COMポート」を開き、名前が「MapperZeroAir 'ESP32SPP'」なポートを控えます。(下の例では「COM3」を控えることになります)
+8. タブ「COMポート」を選択し、名前が「MapperZeroAir 'ESP32SPP'」となっているポートを控えます。(下の例では「COM3」を控えることになります)
 
 ![BluetoothSetup8.png](img/BluetoothSetup8.png)
 
@@ -97,7 +96,7 @@ MapperZeroAirをファミコン本体に挿し、ファミコン本体に電源�
 
 9. https://github.com/isariyokurari/MapperZeroAir/archive/refs/heads/main.zip をダウンロードして展開してください。※以降の例では「C:\MapperZeroAir-main」に展開されたものとして説明を続けます。
 
-10. コマンドプロンプトを開き(Windowsキーを押下し、「cmd」と入力してEnterキーを押す)、展開したディレクトリへ移動してください。(例：「cd C:\MapperZeroAir-main」を実行する)
+10. コマンドプロンプトを開き(例：Windowsキーを押下し、「cmd」と入力してEnterキーを押す)、展開したディレクトリへ移動してください。(例：「cd C:\MapperZeroAir-main」を実行する)
 
 11. 先に控えたCOMポートを使い、「exe\MapperZeroAir.exe <COMポート> nes\prg0000_HelloWorld.nes」を実行してください。(例：「exe\MapperZeroAir.exe COM3 nes\prg0000_HelloWorld.nes」)
 
@@ -121,7 +120,7 @@ MapperZeroAirにプログラムをダウンロードするモードです。「-
 Usage : MapperZeroAir.exe <COMn> <FILE> [--irq]
 ```
 
-対応しているマッパーは マッパー#0 と マッパー#2(CHR-ROMが0kバイト) です。PRG-ROMは16kバイトか32kバイト、CHR-ROMは0kバイトか8kバイトに対応しています。マッパー#0のダウンロードは、最初にCHR-ROMローダをダウンロード実行した後、PRG-ROMをダウンロードします。この時、CHR-ROMローダのダウンロード後とPRG-ROMのダウンロード後にリセット操作の指示が出るので従ってください。マッパー#2をダウンロードする場合、CHR-ROMローダのダウンロード実行はありません。マッパー#2 且つ「--irq」オプション指定し、後述する「IRQをトリガとしたリセット」を実装すると、ファミコン本体の操作なしにダウンロード後にリセットベクタへ飛ばすことができます。16kバイトのPRG-ROMのみのマッパー#2をダウンロード実行することでTATよく実機確認を行えます。
+対応しているマッパーは マッパー#0 と マッパー#2(CHR-ROMが0kバイト) です。PRG-ROMは16kバイトか32kバイト、CHR-ROMは0kバイトか8kバイトに対応しています。マッパー#0のダウンロードは、最初にCHR-ROMローダをダウンロード実行した後、PRG-ROMをダウンロードします。この時、CHR-ROMローダのダウンロード後とPRG-ROMのダウンロード後にリセット操作の指示が出るので従ってください。マッパー#2をダウンロードする場合、CHR-ROMローダのダウンロード実行はありません。マッパー#2 且つ「--irq」オプション指定し、後述する「IRQをトリガとしたリセット」を実装すると、ファミコン本体の操作なしにダウンロード後にリセットベクタへ飛ばすことができます。16kバイトのPRG-ROMのみのマッパー#2をダウンロード実行することで効率よく実機確認を行えます。
 
 参考動画：ファミコンカセットに無線でダウンロードして実行＆自動リセット<br>
 https://youtu.be/zyV-2UMJdmg
@@ -138,7 +137,7 @@ https://youtu.be/Nj-gnS3i97A
 
 ## 3-2. ファミコン用プログラムの書き方
 
-本ドキュメントは、ファミコン用のアセンブラにNESASMを想定しています。アセンブラによるファミコン向けプログラムを作成、修正、エミュレータなどで実行、デバッグできる方を対象として説明します。
+※アセンブラによるファミコン向けプログラムを作成、修正、エミュレータなどで実行、デバッグできる方を対象として説明します。また、ファミコン用のアセンブラにはNESASMを想定しています。
 
 **IRQをトリガとしたリセット**<br>
 サンプル「asm/prg0000_HelloWorld/prg0000_HelloWorld.asm」は、「16kバイトのPRG-ROMのみのマッパー#2」なサンプルプログラムとなっており、「IRQ割り込みをトリガとしたリセット」が実装されています。コード中の FILL_CHR_ROM_EN および USE_IRQ_LOADER を「1」にしておくことで、コード修正後のダウンロード実行を本体に触れずに実行できます。一度 CHR-ROM の内容が転送された後は、FILL_CHR_ROM_EN を「0」にすることで、さらにプログラムの起動を早くすることができます。この仕組みを利用する場合は、FILL_CHR_ROM_EN と記載のある行や USE_IRQ_LOADER と記載のある行を自身のコードに埋め込んでください。シーケンスの詳細は設計情報「ダウンロード実行のシーケンス図」を参考にしてください。
@@ -175,7 +174,7 @@ MapperZeroAir
 │　README.md
 │
 ├─schema
-│　　　MapperZeroAir.pdf          ... 回路図
+│　　　MapperZeroAir.pdf          ... MapperZeroAirの回路図
 │
 ├─exe
 │　　　Makefile
@@ -197,7 +196,7 @@ MapperZeroAir
 
 ## 4-2. 開発環境(動作確認環境)
 
-- Windows10 HOME 64bit 22H2 / Windows 11 HOME 24H2
+- Windows10 HOME 64bit 22H2 / Windows11 HOME 24H2
 - Arduino IDE 2.2.1
 - esp32 by Espressif System 2.0.11
 - gcc version 4.8.1 (GCC) for mingw32
@@ -224,7 +223,196 @@ MapperZeroAir
 カードエッジコネクタのAudio周りは特になにもせずそのまま戻します。<br>
 ![MapperZeroAirBlockDiagram_Audio.png](img/MapperZeroAirBlockDiagram_Audio.png)
 
-ダウンロード実行のシーケンス図
+**「Hello World!」実行の詳細**<br>
+ファミコンにMapperZeroAirを挿して電源をONにした直後は、PRG-RAMにプログラムがないためCPUは暴走します。MapperZeroAir.exeを実行すると、マイコン(ESP32)はPRG-RAMの制御を奪い(Disconnect CPU)、「Hello World!」のプログラム16kByteをPRG-RAMへダウンロードします。ダウンロード完了後、ファミコン本体のリセットボタンを押すことにより、ダウンロードした「Hello World!」のプログラムが実行されます。「Hello World!」のプログラムは、PPUを介してCHR-RAMへパターンを転送した後、Hello World! と表示するプログラムを実行します。下に、動作の概念を図示します。
+![title: "Execute 'Hello World!' by MapperZeroAir"
+box HUMAN
+participant "Finger"
+end box
+box HOST
+participant "MapperZeroAir.exe"
+end box
+box MapperZeroAir
+participant "ESP32"
+participant "PRG-RAM"
+participant "CHR-RAM"
+end box
+box "Family Computer"
+participant "CPU"
+participant "PPU"
+end box
+box "TV"
+participant "Display"
+end box
+activate "Finger"
+"Finger" -> "CPU": Power On
+activate "ESP32"
+activate "CPU"
+activate "PPU"
+loop runaway
+"CPU" -> "PRG-RAM": Fetch
+"CPU" <- "PRG-RAM": Garbage
+end
+"Finger" -> "MapperZeroAir.exe": Execute
+activate "MapperZeroAir.exe"
+"MapperZeroAir.exe" -> "ESP32":Disconnect CPU
+loop runaway
+"CPU" -> "CPU": Fetch Fail
+end
+loop 32kByte
+"MapperZeroAir.exe" -> "ESP32":Download
+"ESP32" -> "PRG-RAM": Download
+activate "PRG-RAM"
+end
+deactivate "MapperZeroAir.exe"
+"Finger" -> "CPU": Reset
+deactivate "Finger"
+"PRG-RAM" <- "CPU":Fetch
+"PRG-RAM" -> "CPU":Code
+"CPU" -> "PPU":Write Pattern
+"PPU" -> "CHR-RAM":Write Pattern
+activate "CHR-RAM"
+"CPU" -> "PPU":Prepare Screen
+loop Terminate
+"CPU" -> "CPU":Jump
+end
+deactivate "CPU"
+loop Normary
+"CHR-RAM" <- "PPU":Fetch
+"CHR-RAM" -> "PPU":Pattern
+"PPU" -> "Display":Output
+activate "Display"
+end loop](http://www.plantuml.com/plantuml/png/XLHDRy8m3BttLtYzS687k5NJ16DyQ19GyJ6atKAnMBGqgK8wwBzVchGbAMox5Vlv-VdPON1IHAeyPO6YYc44uVY2IQuGEZDaJC1EI7PuwC2-W3d9CfGVACMGoZ3OYmlCjlFX8iWq1KreHhY2S4Bv4NKQ-G4qnCAMwusFyhWUyO9-WPVsAyVhkDyB_LYycdPNmtahEfgjRDHb3YSafQo0aKWpFQPiryJRDdSPyHWsxot8AprbZ1HN64aK_IRQnCQD-WEwpxP91B4ueuGbTz3LRDU0aNFzQRGm8JAGEITdKWG6OKXh3oAOe4e-gynJryrCYToJ8vOwVKMtwuYWEWId_PsbtOaPGZj9f9r91EUOAD1oVfDk_J2oOK8eC_eCjj_xUYcqXl_QY3DdWkYXRA1bI9DsdAmlfcnrmBzdlDtT2a-elBfcqJMpiTwWgtqqYOPc90xeRh2CxIJLT35H-ZPvO6Ase3hc5i0vbVhQMuInH7si2Ej48d9hwmPbIZbHs5x2MvvcDvQCcgjR29aIMQwkQcRloncoILpxtunIFvTecIlz1fqPl8TKTWm6-glyT_e1)
+
+※PRG-ROMサイズが16kByteであっても、同じ16kByteのデータを2回転送し32kByteの転送を行います。PRG-ROMサイズが16kByteなカセットにおけるアドレス線を無視することによるミラー効果を再現させています。
+
+**ダウンロード実行のシーケンス図**<br>
+USE_IRQ_LOADERの実装されたプログラムを実行している場合、MapperZeroAir.exeによるダウンロード実行時「--irq」オプションを付与することで、リセットボタンを押下せずにダウンロードしたプログラムの実行が始まります。これは、マイコン(ESP32)がPRG-RAMの制御を奪う前に、CPUのプログラムフェッチ先をWRAM上のコードに移すことで実現しています。USE_IRQ_LOADERのIRQ割り込みルーチンでは、IRQ_SWITCHが0の場合IRQ_SWITCHに1をセットしてWRAM上に自己ループのコードをコピーし、そのコードの先頭へジャンプします。IRQ_SWITCHが1の場合は、RSTベクタへジャンプします。IRQ_SWITCHはRSTベクタで実行されるコードの中で0にします。IRQ-SWITCHは、WRAM上の1Byteを使用します。
+![title: "Execute 'Good Morning' after "Hello World!" by MapperZeroAir"
+box HUMAN
+participant "Finger"
+end box
+box HOST
+participant "MapperZeroAir.exe"
+end box
+box MapperZeroAir
+participant "ESP32"
+participant "PRG-RAM"
+participant "CHR-RAM"
+end box
+box "Family Computer"
+participant "CPU"
+participant "WRAM"
+end box
+activate "Finger"
+activate "ESP32"
+activate "CPU"
+activate "PRG-RAM"
+activate "CHR-RAM"
+activate "WRAM"
+"CPU" -> "WRAM": Write 0 to IRQ_SWITCH
+loop
+"CPU" -> "PRG-RAM": Fetch
+"CPU" <- "PRG-RAM": Code
+end
+"Finger" -> "MapperZeroAir.exe": Execute w/ --irq
+deactivate "Finger"
+activate "MapperZeroAir.exe"
+"MapperZeroAir.exe" -> "ESP32":IRQ
+"ESP32" -> "CPU": IRQ
+"CPU" -> "CPU": IRQ routine
+activate "CPU"
+alt IRQ_SWITCH = 0
+"CPU" -> "WRAM": Write 1 to IRQ_SWITCH
+"CPU" -> "WRAM":Copy code
+activate "WRAM"
+loop
+"CPU" -> "WRAM": Fetch
+"CPU" <- "WRAM": Code
+deactivate "WRAM"
+deactivate "CPU"
+end
+end
+"MapperZeroAir.exe" -> "ESP32":Disconnect CPU
+"ESP32" -> "PRG-RAM":Disconnect
+deactivate "PRG-RAM"
+loop Finish Download
+"MapperZeroAir.exe" -> "ESP32":Download
+"ESP32" -> "PRG-RAM": Download
+activate "PRG-RAM"
+end
+"MapperZeroAir.exe" -> "CPU": IRQ
+deactivate "MapperZeroAir.exe"
+"CPU" -> "CPU":IRQ routine
+activate "CPU"
+alt IRQ_SWITCH = 1
+"CPU" -> "PRG-RAM":Fetch RST vector
+"CPU" <- "PRG-RAM":RST vector
+"CPU" -> "CPU":Jump to RST vector
+deactivate "CPU"
+"CPU" -> "WRAM":Write 0 to IRQ_SWITCH
+loop
+"CPU" -> "PRG-RAM": Fetch
+"CPU" <- "PRG-RAM": Code
+end
+end](http://www.plantuml.com/plantuml/png/hLJBJeD05Dtp5LSsNQ6jxeYQDlHfKgsq3OaRGs6qaqovE9s-_jvXQ666Oes92mXpxlkSExJN8kHYisAMe88H5-pUdaGRGQ0nG8nXZ3oXoMS3mWz1EDX3mXX2W9p5LpOi3Z0EqvJmDyAnGxbjBN0Fm_cuysobCY-DQ1ec0ko-p46acIGnI9VSxMKwCxsCNDTaJym0msn6zgQJkrlRn2R-mF4xumhg3VqSrJFR_N15sG4yNALoTbwDcSmhI62a22D1jw7ah9YpH8wTbO1ALXwBBZMFKuibbDTJiU0y7iyk19nAQnC4miX_VPy6evatj1XYglcUAhZG9o9Q7YttZcxnC2RPEDPf0XLvheSBf_NOtO3ZKFvbnUJI-3MIrc2gMiwKAmUnZjyAphfrGQ75I0K673U29kICNoOqHk01cZ-HrwgGLtNpC3r0bD5JLQD2Sr3FSQ0Hh5ELvz0HrNYcWTBXCabTkeumIKWaG8OPV1MYbZv6cMBXilv1AaRNI-ZYBc4O_bwtyAkhMAQfANTfgb9ZlTEwtJ5Nu2yRqAgx4aejyASps4gUaDTTZZDhKVvfiqgpzT4ypWIjBiZ_NzdiQSjNzXF_1W00)
+
+**マッパー#0のダウンロード**<br>
+マッパー#0のダウンロードは、「CHR-ROMローダのダウンロード実行」「PRG-ROMのダウンロード」の2段階で行われます。「CHR-ROMローダのダウンロード」後、CHR-ROMローダを実行するためファミコン本体のリセットボタンを押し、MapperZeroAir.exeの出力「Release reset button after 0 sec.」のタイミングに合わせてファミコン本体のリセットボタンを話してください。続いてCHR-ROMローダの実行完了を待って「PRG-ROMのダウンロード」が実行されVミラー/Hミラーの設定が行われます。MapperZeroAir.exeの出力に「H_MIRROR request was accepted.」または「V_MIRROR request was accepted.」が表示されたら、ファミコン本体のリセットボタンを押してください。
+![title: "Execute Mapper #0 by MapperZeroAir"
+box HUMAN
+participant "Finger"
+end box
+box HOST
+participant "MapperZeroAir.exe"
+end box
+box MapperZeroAir
+participant "ESP32"
+participant "PRG-RAM"
+participant "CHR-RAM"
+end box
+box "Family Computer"
+participant "CPU"
+participant "PPU"
+end box
+activate "Finger"
+"Finger" -> "CPU": Power On
+activate "ESP32"
+activate "CPU"
+activate "PPU"
+loop runaway
+"CPU" -> "PRG-RAM": Fetch
+"CPU" <- "PRG-RAM": Garbage
+end
+"Finger" -> "MapperZeroAir.exe": Execute
+activate "MapperZeroAir.exe"
+"MapperZeroAir.exe" -> "ESP32":Disconnect CPU
+loop runaway
+"CPU" -> "CPU": Fetch Fail
+end
+"MapperZeroAir.exe" -> "ESP32":Download\nCHR-ROM loader
+"ESP32" -> "PRG-RAM": Download\nCHR-ROM loader
+activate "PRG-RAM"
+"Finger" -> "CPU": Reset
+"MapperZeroAir.exe" -> "MapperZeroAir.exe":Wait 3 sec
+activate "MapperZeroAir.exe"
+"PRG-RAM" <- "CPU":Fetch
+"PRG-RAM" -> "CPU":Code
+"CPU" -> "PPU":Write Pattern
+"PPU" -> "CHR-RAM":Write Pattern
+activate "CHR-RAM"
+loop Terminate
+"CPU" -> "CPU":Jump
+end
+deactivate "MapperZeroAir.exe"
+"MapperZeroAir.exe" -> "ESP32":Download\nPRG-ROM
+"ESP32" -> "PRG-RAM": Download\nPRG-ROM
+"Finger" -> "CPU": Reset
+deactivate "Finger"
+loop
+"CPU" -> "PRG-RAM": Fetch
+"CPU" <- "PRG-RAM": Garbage
+end](http://www.plantuml.com/plantuml/png/fLHDRu904BtpAoRqRDFK6saQZHLD4mf1ZKdZPOM9tGHsoR9K_VTTbWyN2l7WXR0pRsRVl3SmooKHiaWJIrAPe0Fsye9H8H4yacKeuEa5ZjVwy8s2pwcmhIE_m7hdpR-iJ5NJY6Q4IR1ToaweqiXYK90Avc-sNLIdrpDUi5lGINShbvjW-cftOq6uceHphnTThCCgQdQsNPBIv0eBdcPgGj6l2NRztcMawK0YIN-94gOTitc1oNjLxK30pqepdndeclGjeE-v7VKb2USPY8AHCxbQ6g6RDiCvuAACVkhCsyJCh8WuaXEMFBkC_kliG6skSVs06mCntR2QnFcWUSGPmqY2eZD6lT93qmQNqAJYTwSpFxE4a_Z0j7--1-K9XLK3UfgCmWrnc-qOy2h47EKefG7rzeHAc4AEqHtzcbkrK_goshusqR9Oy1XDmylONb3LEI1IxIYpTAmgg9Uw1p0sgzbwxSaMHKgPIlHT-IpIJDiHuqDxqCgln_AzkpQrk34pJ4BDLrREyi0dCLEFylVs1m00)
 
 ## 4-4. テスト
 
