@@ -1,4 +1,4 @@
-/* $Id: MapperZeroAir.c 1563 2023-12-24 23:22:52Z sow $ */
+/* $Id: MapperZeroAir.c 2169 2025-11-02 22:20:38Z sow $ */
 
 #include <windows.h>
 #include <stdio.h>
@@ -273,168 +273,187 @@ int loadNesFile(char *fname, char *prg, char *chr, uint8_t *chrKb, uint8_t *isVm
 
 /* CHR-ROM Loader */
 const char loaderBin[] = {
-                    /*       chr_loader.asm for NESASM3.exe           */
-                    /*       ---------------------------------------- */
-                    /*       ; INES HEADER                            */
-                    /*        .inesprg 2 ; PRG-ROM size (16kByte x n) */
-                    /*        .ineschr 0 ; CHR-ROM size (8kByte x n)  */
-                    /*        .inesmir 0 ; 0:H-Mirror 1:V-Mirror      */
-                    /*        .inesmap 2 ; Mapper#2                   */
-                    /*                                                */
-                    /*       ; HARDWARE REGISTER                      */
-                    /*       ; ----                                   */
-                    /*       PPUCNT0     EQU $2000                    */
-                    /*       PPUCNT1     EQU $2001                    */
-                    /*       PPUSTAT     EQU $2002                    */
-                    /*       PPUADDR     EQU $2006                    */
-                    /*       PPUIO       EQU $2007                    */
-                    /*       DMC_FLAGS   EQU $4010                    */
-                    /*       SPECIO2     EQU $4017                    */
-                    /*                                                */
-                    /*       ; BIT FIELDS                             */
-                    /*       ; ----                                   */
-                    /*       SelectNameTable0 EQU $00 ; PPUCNT0       */
-                    /*       PpuAddrIncSize1  EQU $00 ; PPUCNT0       */
-                    /*       SprPatTblAdr0000 EQU $00 ; PPUCNT0       */
-                    /*       ScrPatTblAdr0000 EQU $00 ; PPUCNT0       */
-                    /*       SprSize8x8       EQU $00 ; PPUCNT0       */
-                    /*       DisNmiAtHitSpr0  EQU $00 ; PPUCNT0       */
-                    /*       DisNmiAtVBlank   EQU $00 ; PPUCNT0       */
-                    /*       EnaNmiAtVBlank   EQU $80 ; PPUCNT0       */
-                    /*       Color            EQU $00 ; PPUCNT1       */
-                    /*       DisBgClip        EQU $02 ; PPUCNT1       */
-                    /*       DisSprClip       EQU $04 ; PPUCNT1       */
-                    /*       DisBgDisplay     EQU $00 ; PPUCNT1       */
-                    /*       EnaBgDisplay     EQU $08 ; PPUCNT1       */
-                    /*       DisSprDisplay    EQU $00 ; PPUCNT1       */
-                    /*       EnaSprDisplay    EQU $10 ; PPUCNT1       */
-                    /*       BgColorGray      EQU $00 ; PPUCNT1       */
-                    /*       BgColorRed       EQU $80 ; PPUCNT1       */
-                    /*       DisDmaIrq        EQU $00 ; DMC_FLAGS     */
-                    /*       DisFrameCountIrq EQU $C0 ; SPECIO2       */
-                    /*                                                */
-                    /*       ; USER DEFINE                            */
-                    /*       DisNMI           EQU (DisNmiAtVBlank | DisNmiAtHitSpr0 | SprSize8x8 | ScrPatTblAdr0000 | SprPatTblAdr0000 | PpuAddrIncSize1 | SelectNameTable0) */
-                    /*       EnaNMI           EQU (EnaNmiAtVBlank | DisNmiAtHitSpr0 | SprSize8x8 | ScrPatTblAdr0000 | SprPatTblAdr0000 | PpuAddrIncSize1 | SelectNameTable0) */
-                    /*       DisDisplay       EQU (BgColorGray | DisSprDisplay | DisBgDisplay | DisSprClip | DisBgClip | Color)                                              */
-                    /*       EnaDisplay       EQU (BgColorRed  | EnaSprDisplay | EnaBgDisplay | DisSprClip | DisBgClip | Color)                                              */
-                    /*                                                */
-                    /*       ; USER MEMORY                            */
-                    /*       WORK             EQU $00                 */
-                    /*       WORK_L           EQU $00                 */
-                    /*       WORK_H           EQU $01                 */
-                    /*       WORK_EXT         EQU $02                 */
-                    /*       IRQ_SWITCH       EQU $FF                 */
-                    /*       STACK_ADDR       EQU $0100               */
-                    /*       SPR_DMA_SRC      EQU $0200               */
-                    /*       RAM_PRG_ADDR     EQU $0300               */
-                    /*                                                */
-                    /*       ; CHR-ROM                                */
-                    /*           .bank 0                              */
-                    /*           .org $8000                           */
-                    /*       CHR_BIN:                                 */
-                    /*                                                */
-                    /*       ; PRG-ROM                                */
-                    /*           .bank 3                              */
-                    /*           .org $FF6A                           */
-                    /*       RST_VEC:                                 */
-  0x78,             /* FF6A:     sei                                  */
-  0xD8,             /* FF6B:     cld                                  */
-  0xA2, 0xFF,       /* FF6C:     ldx #$FF                             */
-  0x9A,             /* FF6E:     txs                                  */
-  0x20, 0xD2, 0xFF, /* FF6F:     jsr WAIT_NEXT_VBLANK                 */
-  0xA9, 0x00,       /* FF72:     lda #DisNMI                          */
-  0x8D, 0x00, 0x20, /* FF74:     sta PPUCNT0                          */
-  0xA9, 0x06,       /* FF77:     lda #DisDisplay                      */
-  0x8D, 0x01, 0x20, /* FF79:     sta PPUCNT1                          */
-                    /*                                                */
-                    /*       FILL_CHR_ROM                             */
-  0xA9, 0x00,       /* FF7C:     lda #low(CHR_BIN)                    */
-  0x85, 0x00,       /* FF7E:     sta <WORK_L                          */
-  0xA9, 0x80,       /* FF80:     lda #high(CHR_BIN)                   */
-  0x85, 0x01,       /* FF82:     sta <WORK_H                          */
-  0xA0, 0x00,       /* FF84:     ldy #$00                             */
-  0xA2, 0x00,       /* FF86:     ldx #$00                             */
-                    /*       FILL_CHR_ROM_0:                          */
-  0x20, 0xD2, 0xFF, /* FF88:     jsr WAIT_NEXT_VBLANK                 */
-  0x8E, 0x06, 0x20, /* FF8B:     stx PPUADDR                          */
-  0x8C, 0x06, 0x20, /* FF8E:     sty PPUADDR                          */
-                    /*       FILL_CHR_ROM_1:                          */
-  0xB1, 0x00,       /* FF91:     lda [WORK],y                         */
-  0x8D, 0x07, 0x20, /* FF93:     sta PPUIO                            */
-  0xC8,             /* FF96:     iny                                  */
-  0x98,             /* FF97:     tya                                  */
-  0x29, 0x3F,       /* FF98:     and #$3F                             */
-  0xD0, 0xF5,       /* FF9A:     bne FILL_CHR_ROM_1                   */
-  0x98,             /* FF9C:     tya                                  */
-  0xD0, 0xE9,       /* FF9D:     bne FILL_CHR_ROM_0                   */
-  0xE6, 0x01,       /* FF9F:     inc <WORK_H                          */
-  0xE8,             /* FFA1:     inx                                  */
-  0xE0, 0x20,       /* FFA2:     cpx #$20                             */
-  0xD0, 0xE2,       /* FFA4:     bne FILL_CHR_ROM_0                   */
-  0x20, 0xD2, 0xFF, /* FFA6:     jsr WAIT_NEXT_VBLANK                 */
-                    /*                                                */
-                    /*       COPY_WAIT_AND_RESET:                     */
-  0xA0, 0x1A,       /* FFA9:     ldy #$1A ; Size of WAIT_AND_RESET    */
-  0xA2, 0x00,       /* FFAB:     ldx #$00                             */
-                    /*       COPY_WAIT_AND_RESET_LOOP:                */
-  0xBD, 0xDF, 0xFF, /* FFAD:     lda WAIT_AND_RESET,x                 */
-  0x9D, 0x00, 0x03, /* FFB0:     sta RAM_PRG_ADDR,x                   */
-  0xE8,             /* FFB3:     inx                                  */
-  0x88,             /* FFB4:     dey                                  */
-  0xD0, 0xF6,       /* FFB5:     bne COPY_WAIT_AND_RESET_LOOP         */
-                    /*                                                */
-                    /*       MAIN_CLOSING:                            */
-  0xA9, 0x00,       /* FFB7:     lda #$00                             */
-  0x85, 0x00,       /* FFB9:     sta <WORK_L                          */
-  0x85, 0x01,       /* FFBB:     sta <WORK_H                          */
-  0x85, 0x02,       /* FFBD:     sta <WORK_EXT                        */
-  0xA9, 0x9E,       /* FFBF:     lda #EnaDisplay                      */
-  0x8D, 0x01, 0x20, /* FFC1:     sta PPUCNT1                          */
-  0xA9, 0x00,       /* FFC4:     lda #DisDmaIrq                       */
-  0x8D, 0x10, 0x40, /* FFC6:     sta DMC_FLAGS                        */
-  0xA9, 0xC0,       /* FFC9:     lda #DisFrameCountIrq                */
-  0x8D, 0x17, 0x40, /* FFCB:     sta SPECIO2                          */
-  0x58,             /* FFCE:     cli                                  */
-  0x4C, 0x00, 0x03, /* FFCF:     jmp RAM_PRG_ADDR                     */
-                    /*                                                */
-                    /*       WAIT_NEXT_VBLANK:                        */
-  0x48,             /* FFD2:     pha                                  */
-                    /*       WAIT_NEXT_VBLANK_0:                      */
-  0xAD, 0x02, 0x20, /* FFD3:     lda PPUSTAT                          */
-  0x10, 0xFB,       /* FFD6:     bpl WAIT_NEXT_VBLANK_0               */
-                    /*       WAIT_NEXT_VBLANK_1:                      */
-  0xAD, 0x02, 0x20, /* FFD8:     lda PPUSTAT                          */
-  0x30, 0xFB,       /* FFDB:     bmi WAIT_NEXT_VBLANK_1               */
-  0x68,             /* FFDD:     pla                                  */
-  0x60,             /* FFDE:     rts                                  */
-                    /*                                                */
-                    /*       WAIT_AND_RESET:                          */
-  0x18,             /* FFDF:     clc                                  */
-  0xA9, 0x01,       /* FFE0:     lda #$01                             */
-  0x65, 0x00,       /* FFE2:     adc <WORK_L                          */
-  0x85, 0x00,       /* FFE4:     sta <WORK_L                          */
-  0xA9, 0x00,       /* FFE6:     lda #$00                             */
-  0x65, 0x01,       /* FFE8:     adc <WORK_H                          */
-  0x85, 0x01,       /* FFEA:     sta <WORK_H                          */
-  0xA9, 0x00,       /* FFEC:     lda #$00                             */
-  0x65, 0x02,       /* FFEE:     adc <WORK_EXT                        */
-  0x85, 0x02,       /* FFF0:     sta <WORK_EXT                        */
-  0xC9, 0x05,       /* FFF2:     cmp #$05                             */
-  0xD0, 0xE9,       /* FFF4:     bne WAIT_AND_RESET                   */
-  0x6C, 0xFC, 0xFF, /* FFF6:     jmp [RST_VECTOR]                     */
-                    /*                                                */
-                    /*       NMI_VEC:                                 */
-                    /*       IRQ_VEC:                                 */
-  0x40,             /* FFF9:     rti                                  */
-                    /*           .bank 3                              */
-                    /*           .org $FFFA                           */
-                    /*       NMI_VECOTR:                              */
-  0xF9, 0xFF,       /* FFFA:     .dw NMI_VEC                          */
-                    /*       RST_VECTOR:                              */
-  0x6A, 0xFF,       /* FFFC:     .dw RST_VEC                          */
-                    /*       IRQ_VECTOR:                              */
-  0xF9, 0xFF,       /* FFFE:     .dw IRQ_VEC                          */
+                    /*      ; $Id: MapperZeroAir.c 2169 2025-11-02 22:20:38Z sow $ */
+                    /*      ;---------------------------------------------------- */
+                    /*      ; INES HEADER                                         */
+                    /*       .inesprg 2 ; PRG-ROM size (16kByte x n)              */
+                    /*       .ineschr 0 ; CHR-ROM size (8kByte x n)               */
+                    /*       .inesmir 0 ; 0:H-Mirror 1:V-Mirror                   */
+                    /*       .inesmap 2 ; Mapper#2                                */
+                    /*                                                            */
+                    /*      ; HARDWARE REGISTER                                   */
+                    /*      ; ----                                                */
+                    /*      PPUCNT0     EQU $2000                                 */
+                    /*      PPUCNT1     EQU $2001                                 */
+                    /*      PPUSTAT     EQU $2002                                 */
+                    /*      PPUADDR     EQU $2006                                 */
+                    /*      PPUIO       EQU $2007                                 */
+                    /*      DMC_FLAGS   EQU $4010                                 */
+                    /*      SPECIO2     EQU $4017                                 */
+                    /*                                                            */
+                    /*      ; BIT FIELDS                                          */
+                    /*      ; ----                                                */
+                    /*      SelectNameTable0 EQU $00 ; PPUCNT0                    */
+                    /*      PpuAddrIncSize1  EQU $00 ; PPUCNT0                    */
+                    /*      SprPatTblAdr0000 EQU $00 ; PPUCNT0                    */
+                    /*      ScrPatTblAdr0000 EQU $00 ; PPUCNT0                    */
+                    /*      SprSize8x8       EQU $00 ; PPUCNT0                    */
+                    /*      DisNmiAtHitSpr0  EQU $00 ; PPUCNT0                    */
+                    /*      DisNmiAtVBlank   EQU $00 ; PPUCNT0                    */
+                    /*      EnaNmiAtVBlank   EQU $80 ; PPUCNT0                    */
+                    /*      Color            EQU $00 ; PPUCNT1                    */
+                    /*      DisBgClip        EQU $02 ; PPUCNT1                    */
+                    /*      DisSprClip       EQU $04 ; PPUCNT1                    */
+                    /*      DisBgDisplay     EQU $00 ; PPUCNT1                    */
+                    /*      EnaBgDisplay     EQU $08 ; PPUCNT1                    */
+                    /*      DisSprDisplay    EQU $00 ; PPUCNT1                    */
+                    /*      EnaSprDisplay    EQU $10 ; PPUCNT1                    */
+                    /*      BgColorGray      EQU $00 ; PPUCNT1                    */
+                    /*      BgColorRed       EQU $80 ; PPUCNT1                    */
+                    /*      DisDmaIrq        EQU $00 ; DMC_FLAGS                  */
+                    /*      DisFrameCountIrq EQU $C0 ; SPECIO2                    */
+                    /*                                                            */
+                    /*      ; USER DEFINE                                         */
+                    /*      DisNMI           EQU (DisNmiAtVBlank | DisNmiAtHitSpr0 | SprSize8x8 | ScrPatTblAdr0000 | SprPatTblAdr0000 | PpuAddrIncSize1 | SelectNameTable0) */
+                    /*      EnaNMI           EQU (EnaNmiAtVBlank | DisNmiAtHitSpr0 | SprSize8x8 | ScrPatTblAdr0000 | SprPatTblAdr0000 | PpuAddrIncSize1 | SelectNameTable0) */
+                    /*      DisDisplay       EQU (BgColorGray | DisSprDisplay | DisBgDisplay | DisSprClip | DisBgClip | Color) */
+                    /*      EnaDisplay       EQU (BgColorRed  | EnaSprDisplay | EnaBgDisplay | DisSprClip | DisBgClip | Color) */
+                    /*      TurnOffLED       EQU $FE                              */
+                    /*      TurnOnLED        EQU $FF                              */
+                    /*                                                            */
+                    /*      ; USER MEMORY                                         */
+                    /*      ZP_ADDR          EQU $00                              */
+                    /*      ZP_ADDR_L        EQU $00                              */
+                    /*      ZP_ADDR_H        EQU $01                              */
+                    /*      ZP_BACKUP_L      EQU $01C0                            */
+                    /*      ZP_BACKUP_H      EQU $01C1                            */
+                    /*      WORK_L           EQU $01C2                            */
+                    /*      WORK_M           EQU $01C3                            */
+                    /*      WORK_H           EQU $01C4                            */
+                    /*      RAM_PRG_ADDR     EQU $01D0                            */
+                    /*      LED_PORT         EQU $6000                            */
+                    /*                                                            */
+                    /*      ; CHR-ROM                                             */
+                    /*          .bank 0                                           */
+                    /*          .org $8000                                        */
+                    /*      CHR_BIN:                                              */
+                    /*                                                            */
+                    /*      ; PRG-ROM                                             */
+                    /*          .bank 3                                           */
+                    /*          .org $FF3E                                        */
+                    /*      IRQ_VEC:                                              */
+                    /*      RST_VEC:                                              */
+  0x78,             /* FF3E:    sei                                               */
+  0xD8,             /* FF3F:    cld                                               */
+  0xA2, 0xFF,       /* FF40:    ldx #$FF                                          */
+  0x9A,             /* FF42:    txs                                               */
+  0x20, 0xC7, 0xFF, /* FF43:    jsr WAIT_NEXT_VBLANK                              */
+  0xA9, 0x00,       /* FF46:    lda #DisNMI                                       */
+  0x8D, 0x00, 0x20, /* FF48:    sta PPUCNT0                                       */
+  0xA9, 0x06,       /* FF4B:    lda #DisDisplay                                   */
+  0x8D, 0x01, 0x20, /* FF4D:    sta PPUCNT1                                       */
+                    /*      LED_OFF:                                              */
+  0xA9, 0xFE,       /* FF50:    lda #TurnOffLED                                   */
+  0x8D, 0x00, 0x60, /* FF52:    sta LED_PORT                                      */
+                    /*      BACKUP_ZP:                                            */
+  0xA5, 0x00,       /* FF55:    lda <ZP_ADDR_L                                    */
+  0x8D, 0xC0, 0x01, /* FF57:    sta ZP_BACKUP_L                                   */
+  0xA5, 0x01,       /* FF5A:    lda <ZP_ADDR_H                                    */
+  0x8D, 0xC1, 0x01, /* FF5C:    sta ZP_BACKUP_H                                   */
+                    /*      FILL_CHR_ROM                                          */
+  0xA9, 0x00,       /* FF5F:    lda #low(CHR_BIN)                                 */
+  0x85, 0x00,       /* FF61:    sta <ZP_ADDR_L                                    */
+  0xA9, 0x80,       /* FF63:    lda #high(CHR_BIN)                                */
+  0x85, 0x01,       /* FF65:    sta <ZP_ADDR_H                                    */
+  0xA0, 0x00,       /* FF67:    ldy #$00                                          */
+  0xA2, 0x00,       /* FF69:    ldx #$00                                          */
+                    /*      FILL_CHR_ROM_0:                                       */
+  0x20, 0xC7, 0xFF, /* FF6B:    jsr WAIT_NEXT_VBLANK                              */
+  0x8E, 0x06, 0x20, /* FF6E:    stx PPUADDR                                       */
+  0x8C, 0x06, 0x20, /* FF71:    sty PPUADDR                                       */
+                    /*      FILL_CHR_ROM_1:                                       */
+  0xB1, 0x00,       /* FF74:    lda [ZP_ADDR],y                                   */
+  0x8D, 0x07, 0x20, /* FF76:    sta PPUIO                                         */
+  0xC8,             /* FF79:    iny                                               */
+  0x98,             /* FF7A:    tya                                               */
+  0x29, 0x3F,       /* FF7B:    and #$3F                                          */
+  0xD0, 0xF5,       /* FF7D:    bne FILL_CHR_ROM_1                                */
+  0x98,             /* FF7F:    tya                                               */
+  0xD0, 0xE9,       /* FF80:    bne FILL_CHR_ROM_0                                */
+  0xE6, 0x01,       /* FF82:    inc <ZP_ADDR_H                                    */
+  0xE8,             /* FF84:    inx                                               */
+  0xE0, 0x20,       /* FF85:    cpx #$20                                          */
+  0xD0, 0xE2,       /* FF87:    bne FILL_CHR_ROM_0                                */
+  0x20, 0xC7, 0xFF, /* FF89:    jsr WAIT_NEXT_VBLANK                              */
+                    /*      STORE_ZP:                                             */
+  0xAD, 0xC0, 0x01, /* FF8C:    lda ZP_BACKUP_L                                   */
+  0x85, 0x00,       /* FF8F:    sta <ZP_ADDR_L                                    */
+  0xAD, 0xC1, 0x01, /* FF91:    lda ZP_BACKUP_H                                   */
+  0x85, 0x01,       /* FF94:    sta <ZP_ADDR_H                                    */
+                    /*      COPY_WAIT_AND_RESET:                                  */
+  0xA0, 0x25,       /* FF96:    ldy #$25 ; Size of WAIT_AND_RESET                 */
+  0xA2, 0x00,       /* FF98:    ldx #$00                                          */
+                    /*      COPY_WAIT_AND_RESET_LOOP:                             */
+  0xBD, 0xD4, 0xFF, /* FF9A:    lda WAIT_AND_RESET,x                              */
+  0x9D, 0xD0, 0x01, /* FF9D:    sta RAM_PRG_ADDR,x                                */
+  0xE8,             /* FFA0:    inx                                               */
+  0x88,             /* FFA1:    dey                                               */
+  0xD0, 0xF6,       /* FFA2:    bne COPY_WAIT_AND_RESET_LOOP                      */
+                    /*      LED_ON:                                               */
+  0xA9, 0xFF,       /* FFA4:    lda #TurnOnLED                                    */
+  0x8D, 0x00, 0x60, /* FFA6:    sta LED_PORT                                      */
+                    /*      MAIN_CLOSING:                                         */
+  0xA9, 0x00,       /* FFA9:    lda #$00                                          */
+  0x8D, 0xC2, 0x01, /* FFAB:    sta WORK_L                                        */
+  0x8D, 0xC3, 0x01, /* FFAE:    sta WORK_M                                        */
+  0x8D, 0xC4, 0x01, /* FFB1:    sta WORK_H                                        */
+  0xA9, 0x9E,       /* FFB4:    lda #EnaDisplay                                   */
+  0x8D, 0x01, 0x20, /* FFB6:    sta PPUCNT1                                       */
+  0xA9, 0x00,       /* FFB9:    lda #DisDmaIrq                                    */
+  0x8D, 0x10, 0x40, /* FFBB:    sta DMC_FLAGS                                     */
+  0xA9, 0xC0,       /* FFBE:    lda #DisFrameCountIrq                             */
+  0x8D, 0x17, 0x40, /* FFC0:    sta SPECIO2                                       */
+  0x58,             /* FFC3:    cli                                               */
+  0x4C, 0xD0, 0x01, /* FFC4:    jmp RAM_PRG_ADDR                                  */
+                    /*                                                            */
+                    /*      WAIT_NEXT_VBLANK:                                     */
+  0x48,             /* FFC7:    pha                                               */
+                    /*      WAIT_NEXT_VBLANK_0:                                   */
+  0xAD, 0x02, 0x20, /* FFC8:    lda PPUSTAT                                       */
+  0x10, 0xFB,       /* FFCB:    bpl WAIT_NEXT_VBLANK_0                            */
+                    /*      WAIT_NEXT_VBLANK_1:                                   */
+  0xAD, 0x02, 0x20, /* FFCD:    lda PPUSTAT                                       */
+  0x30, 0xFB,       /* FFD0:    bmi WAIT_NEXT_VBLANK_1                            */
+  0x68,             /* FFD2:    pla                                               */
+  0x60,             /* FFD3:    rts                                               */
+                    /*                                                            */
+                    /*      WAIT_AND_RESET:                                       */
+  0x18,             /* FFD4:    clc                                               */
+  0xA9, 0x01,       /* FFD5:    lda #$01                                          */
+  0x6D, 0xC2, 0x01, /* FFD7:    adc WORK_L                                        */
+  0x8D, 0xC2, 0x01, /* FFDA:    sta WORK_L                                        */
+  0xA9, 0x00,       /* FFDD:    lda #$00                                          */
+  0x6D, 0xC3, 0x01, /* FFDF:    adc WORK_M                                        */
+  0x8D, 0xC3, 0x01, /* FFE2:    sta WORK_M                                        */
+  0xA9, 0x00,       /* FFE5:    lda #$00                                          */
+  0x6D, 0xC4, 0x01, /* FFE7:    adc WORK_H                                        */
+  0x8D, 0xC4, 0x01, /* FFEA:    sta WORK_H                                        */
+  0xC9, 0x0E,       /* FFED:    cmp #$0E                                          */
+  0xD0, 0xE3,       /* FFEF:    bne WAIT_AND_RESET                                */
+  0xA9, 0xFE,       /* FFF1:    lda #TurnOffLED                                   */
+  0x8D, 0x00, 0x60, /* FFF3:    sta LED_PORT                                      */
+  0x6C, 0xFC, 0xFF, /* FFF6:    jmp [RST_VECTOR]                                  */
+                    /*                                                            */
+                    /*      NMI_VEC:                                              */
+  0x40,             /* FFF9:    rti                                               */
+                    /*          .bank 3                                           */
+                    /*          .org $FFFA                                        */
+                    /*      NMI_VECOTR:                                           */
+  0xF9, 0xFF,       /* FFFA:    .dw NMI_VEC                                       */
+                    /*      RST_VECTOR:                                           */
+  0x3E, 0xFF,       /* FFFC:    .dw RST_VEC                                       */
+                    /*      IRQ_VECTOR:                                           */
+  0x3E, 0xFF,       /* FFFE:    .dw IRQ_VEC                                       */
 };
 
 /* MapperZeroAirUtil */
@@ -546,7 +565,7 @@ void showUsage(void){
   printf("Usage1 : %s <COMn> <FILE> [--irq]\n", APP_NAME);
   printf("Usage2 : %s <COMn> --spi\n", APP_NAME);
   printf("    COMn ... Bluetooth COM port for connecting to MapperZeroAir.\n");
-  printf("    FILE ... .nes file that is formated as mapper #0.\n");
+  printf("    FILE ... .nes file formated as mapper #0 or #2.\n");
 }
 
 /* Applications */
@@ -637,7 +656,7 @@ int execDownload(int argc, char *argv[]){
       return EXIT_FAILURE;
     }
     memcpy(buff32Kb_loader, buff8Kb, chrKb * 1024);
-    memcpy(&buff32Kb_loader[0xFF6A-ROM_ADDR_OFFSET], loaderBin, sizeof(loaderBin));
+    memcpy(&buff32Kb_loader[(0xFF3E)-ROM_ADDR_OFFSET], loaderBin, sizeof(loaderBin));
     if(MapperZeroAir_Send32Kb(hComm, buff32Kb_loader) == EXIT_FAILURE){
       CloseHandle(hComm);
       free(buff32Kb_loader);
@@ -646,19 +665,41 @@ int execDownload(int argc, char *argv[]){
     }
   }
 
-  /* Wait for load CHR-ROM */
+  /* Execute CHR-ROM loader */
   if(chrKb != 0){
     int8_t i;
-    printf("CAUTION: Please reset Family Computer to run CHR-ROM loader.\n");
-    for(i = 3; i >= 0; i--){ 
-      printf("Release reset button after %d sec.\r", i);
-      fflush(stdout);
-      if(i){
-        sleep(1);
+    /* Send IRQ to Execute CHR-ROM loader */
+    if(irqEnable){
+      addr = COMMAND_TOGGLE_IRQ << ADDR_DECODE_POS;
+      data = 0x00; /* Don't care */
+      if(writeByte(hComm, addr, data) == EXIT_FAILURE){
+        printf("ERROR: Failed to toggle IRQ.\n");
+        CloseHandle(hComm);
+        free(buff32Kb);
+        free(buff8Kb);
+        return EXIT_FAILURE;
       }else{
-        printf("\n");
+        do{
+          receiveByteSynchronous(hComm, &buff);
+        }while(COMMAND_TOGGLE_IRQ != buff);
+        printf("IRQ request was accepted.\n");
+        fflush(stdout);
       }
     }
+    /* Request reset to Execute CHR-ROM loader */
+    else{
+      printf("CAUTION: Please reset Family Computer to run CHR-ROM loader.\n");
+      for(i = 3; i >= 0; i--){ 
+        printf("Release reset button after %d sec.\r", i);
+        fflush(stdout);
+        if(i){
+          sleep(1);
+        }else{
+          printf("\n");
+        }
+      }
+    }
+    /* Wait to complete loading CHR-ROM */
     for(i = 3; i >= 0; i--){ 
       printf("Waiting rest %d sec to finish loading CHR-ROM.\r", i);
       fflush(stdout);
@@ -853,7 +894,7 @@ int serialEnable(int argc, char *argv[]){
 
 int main(int argc, char *argv[]){
   /* Show Revision */
-  char versionString[] = "$Rev: 1563 $";
+  char versionString[] = "$Rev: 2169 $";
   versionString[strlen(versionString)-1] = 0;
   printf("%s %s\n----\n", APP_NAME, &versionString[1]);
   fflush(stdout);
